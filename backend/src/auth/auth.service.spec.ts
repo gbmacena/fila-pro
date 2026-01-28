@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
@@ -68,15 +70,9 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      // @ts-ignore
-      prismaService.user.findFirst // @ts-ignore
-        .mockResolvedValue(null);
-      jest
-        .mocked(prismaService.user.create) // @ts-ignore
-        .mockResolvedValue(mockUser);
-      jest
-        .mocked(bcrypt.hash) // @ts-ignore
-        .mockResolvedValue('hashedpassword' as never);
+      prismaService.user.findFirst.mockResolvedValue(null);
+      jest.mocked(prismaService.user.create).mockResolvedValue(mockUser);
+      jest.mocked(bcrypt.hash).mockResolvedValue('hashedpassword' as never);
 
       const result = await service.register(
         registerDto.username,
@@ -110,9 +106,7 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      // @ts-ignore
-      prismaService.user.findFirst // @ts-ignore
-        .mockResolvedValue(mockUser);
+      prismaService.user.findFirst.mockResolvedValue(mockUser);
 
       await expect(
         service.register(
@@ -130,8 +124,7 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      prismaService.user.findFirst // @ts-ignore
-        .mockResolvedValue(mockUser);
+      prismaService.user.findFirst.mockResolvedValue(mockUser);
 
       await expect(
         service.register(
@@ -152,15 +145,10 @@ describe('AuthService', () => {
 
       const expectedToken = 'jwt-token-123';
 
-      jest
-        .mocked(prismaService.user.findUnique) // @ts-ignore
-        .mockResolvedValue(mockUser);
-      jest
-        .mocked(bcrypt.compare) // @ts-ignore
-        .mockResolvedValue(true);
+      jest.mocked(prismaService.user.findUnique).mockResolvedValue(mockUser);
+      jest.mocked(bcrypt.compare).mockResolvedValue(true);
       jwtService.sign.mockReturnValue(expectedToken);
 
-      // Act
       const result = await service.login(loginDto.username, loginDto.password);
 
       expect(result).toEqual({
@@ -190,9 +178,7 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      jest
-        .mocked(prismaService.user.findUnique) // @ts-ignore
-        .mockResolvedValue(null);
+      jest.mocked(prismaService.user.findUnique).mockResolvedValue(null);
 
       await expect(
         service.login(loginDto.username, loginDto.password),
@@ -205,12 +191,8 @@ describe('AuthService', () => {
         password: 'wrongpassword',
       };
 
-      jest
-        .mocked(prismaService.user.findUnique) // @ts-ignore
-        .mockResolvedValue(mockUser);
-      jest
-        .mocked(bcrypt.compare) // @ts-ignore
-        .mockResolvedValue(false);
+      jest.mocked(prismaService.user.findUnique).mockResolvedValue(mockUser);
+      jest.mocked(bcrypt.compare).mockResolvedValue(false);
 
       await expect(
         service.login(loginDto.username, loginDto.password),

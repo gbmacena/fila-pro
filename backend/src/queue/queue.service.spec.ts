@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueueService } from './queue.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -82,9 +84,7 @@ describe('QueueService', () => {
 
   describe('getQueueState', () => {
     it('should return correct queue state', async () => {
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue(mockTickets);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue(mockTickets);
 
       const result = await service.getQueueState(mockUserId);
 
@@ -102,7 +102,7 @@ describe('QueueService', () => {
     it('should return default average time when no completed tickets', async () => {
       const ticketsWithoutDone = mockTickets.filter((t) => t.status !== 'DONE');
       jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
+        .mocked(prismaService.ticket.findMany)
         .mockResolvedValue(ticketsWithoutDone);
 
       const result = await service.getQueueState(mockUserId);
@@ -111,9 +111,7 @@ describe('QueueService', () => {
     });
 
     it('should return empty queue state', async () => {
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue([]);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       const result = await service.getQueueState(mockUserId);
 
@@ -131,19 +129,15 @@ describe('QueueService', () => {
       const callingTicket = mockTickets.find((t) => t.status === 'CALLING');
 
       prismaService.ticket.findFirst
-        // @ts-ignore
+
         .mockResolvedValueOnce(nextTicket)
-        // @ts-ignore
+
         .mockResolvedValueOnce(callingTicket);
 
-      jest
-        .mocked(prismaService.ticket.update) // @ts-ignore
-        .mockResolvedValue({} as any);
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue([]);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
-      const result = await service.callNext(mockUserId);
+      await service.callNext(mockUserId);
 
       expect(prismaService.ticket.update).toHaveBeenCalledWith({
         where: { id: callingTicket!.id },
@@ -156,9 +150,7 @@ describe('QueueService', () => {
     });
 
     it('should throw NoTicketsInQueueException when no waiting tickets', async () => {
-      jest
-        .mocked(prismaService.ticket.findFirst) // @ts-ignore
-        .mockResolvedValue(null);
+      jest.mocked(prismaService.ticket.findFirst).mockResolvedValue(null);
 
       await expect(service.callNext(mockUserId)).rejects.toThrow(
         NoTicketsInQueueException,
@@ -174,17 +166,13 @@ describe('QueueService', () => {
       );
 
       prismaService.ticket.findFirst
-        // @ts-ignore
+
         .mockResolvedValueOnce(nextTicket)
-        // @ts-ignore
+
         .mockResolvedValueOnce(null);
 
-      jest
-        .mocked(prismaService.ticket.update) // @ts-ignore
-        .mockResolvedValue({} as any);
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue([]);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       await service.callNext(mockUserId);
 
@@ -198,17 +186,12 @@ describe('QueueService', () => {
 
   describe('finish', () => {
     it('should finish current calling ticket', async () => {
-      // Arrange
       const callingTicket = mockTickets.find((t) => t.status === 'CALLING');
       jest
-        .mocked(prismaService.ticket.findFirst) // @ts-ignore
+        .mocked(prismaService.ticket.findFirst)
         .mockResolvedValue(callingTicket);
-      jest
-        .mocked(prismaService.ticket.update) // @ts-ignore
-        .mockResolvedValue({} as any);
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue([]);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       const result = await service.finish(mockUserId);
 
@@ -220,9 +203,7 @@ describe('QueueService', () => {
     });
 
     it('should throw BadRequestException when no calling ticket', async () => {
-      jest
-        .mocked(prismaService.ticket.findFirst) // @ts-ignore
-        .mockResolvedValue(null);
+      jest.mocked(prismaService.ticket.findFirst).mockResolvedValue(null);
 
       await expect(service.finish(mockUserId)).rejects.toThrow(
         BadRequestException,
@@ -232,7 +213,6 @@ describe('QueueService', () => {
 
   describe('getMyPosition', () => {
     it('should return ticket position correctly', async () => {
-      // Arrange
       const ticketCode = 'A001';
       const ticket = mockTickets.find((t) => t.code === ticketCode);
       const waitingTickets = mockTickets.filter((t) => t.status === 'WAITING');
@@ -240,13 +220,13 @@ describe('QueueService', () => {
       const doneTickets = mockTickets.filter((t) => t.status === 'DONE');
 
       prismaService.ticket.findFirst
-        // @ts-ignore
+
         .mockResolvedValueOnce(ticket)
-        // @ts-ignore
+
         .mockResolvedValueOnce(null);
 
       prismaService.ticket.findMany
-        // @ts-ignore
+
         .mockResolvedValueOnce(waitingTickets)
         .mockResolvedValueOnce(doneTickets);
 
@@ -261,9 +241,7 @@ describe('QueueService', () => {
     });
 
     it('should throw TicketNotFoundException when ticket not found', async () => {
-      jest
-        .mocked(prismaService.ticket.findFirst) // @ts-ignore
-        .mockResolvedValue(null);
+      jest.mocked(prismaService.ticket.findFirst).mockResolvedValue(null);
 
       await expect(
         service.getMyPosition('INVALID', mockUserId),
@@ -275,10 +253,10 @@ describe('QueueService', () => {
       const ticket = mockTickets.find((t) => t.code === ticketCode);
 
       prismaService.ticket.findFirst
-        // @ts-ignore
+
         .mockResolvedValueOnce(ticket)
-        // @ts-ignore
-        .mockResolvedValueOnce(ticket); // calling ticket
+
+        .mockResolvedValueOnce(ticket);
 
       const result = await service.getMyPosition(ticketCode, mockUserId);
 
@@ -290,9 +268,7 @@ describe('QueueService', () => {
 
   describe('getPublicQueueState', () => {
     it('should return public queue state', async () => {
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue(mockTickets);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue(mockTickets);
 
       const result = await service.getPublicQueueState(mockUserId);
 

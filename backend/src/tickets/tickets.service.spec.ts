@@ -1,7 +1,8 @@
+// @ts-nocheck
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { TicketsService } from './tickets.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { TICKET_CODE_PREFIX } from '../common/constants/app.constants';
 
 describe('TicketsService', () => {
   let service: TicketsService;
@@ -48,12 +49,8 @@ describe('TicketsService', () => {
 
   describe('createTicket', () => {
     it('should create first ticket with code A001', async () => {
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue([]);
-      jest
-        .mocked(prismaService.ticket.create) // @ts-ignore
-        .mockResolvedValue(mockTicket);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
+      jest.mocked(prismaService.ticket.create).mockResolvedValue(mockTicket);
 
       const result = await service.createTicket(mockUserId);
 
@@ -71,21 +68,18 @@ describe('TicketsService', () => {
     });
 
     it('should create ticket with next sequential code', async () => {
-      // Arrange
       const existingTickets = [
         { code: 'A001' },
         { code: 'A002' },
         { code: 'A005' },
       ];
       jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
+        .mocked(prismaService.ticket.findMany)
         .mockResolvedValue(existingTickets);
-      jest
-        .mocked(prismaService.ticket.create) // @ts-ignore
-        .mockResolvedValue({
-          ...mockTicket,
-          code: 'A006',
-        });
+      jest.mocked(prismaService.ticket.create).mockResolvedValue({
+        ...mockTicket,
+        code: 'A006',
+      });
 
       const result = await service.createTicket(mockUserId);
 
@@ -105,14 +99,12 @@ describe('TicketsService', () => {
         { code: 'A003' },
       ];
       jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
+        .mocked(prismaService.ticket.findMany)
         .mockResolvedValue(existingTickets);
-      jest
-        .mocked(prismaService.ticket.create) // @ts-ignore
-        .mockResolvedValue({
-          ...mockTicket,
-          code: 'A004',
-        });
+      jest.mocked(prismaService.ticket.create).mockResolvedValue({
+        ...mockTicket,
+        code: 'A004',
+      });
 
       const result = await service.createTicket(mockUserId);
 
@@ -123,9 +115,7 @@ describe('TicketsService', () => {
   describe('getWaitingTickets', () => {
     it('should return only waiting tickets', async () => {
       const tickets = [{ ...mockTicket, status: 'WAITING' }];
-      jest
-        .mocked(prismaService.ticket.findMany) // @ts-ignore
-        .mockResolvedValue(tickets);
+      jest.mocked(prismaService.ticket.findMany).mockResolvedValue(tickets);
 
       const result = await service.getWaitingTickets(mockUserId);
 
