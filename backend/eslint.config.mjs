@@ -18,15 +18,7 @@ export default tseslint.config(
       },
       sourceType: 'commonjs',
       parserOptions: {
-        projectService: {
-          allowDefaultProject: [
-            'src/app.controller.spec.ts',
-            'src/auth/auth.service.spec.ts',
-            'src/queue/queue.service.spec.ts',
-            'src/tickets/tickets.service.spec.ts',
-            'test/app.e2e-spec.ts',
-          ],
-        },
+        project: ['./tsconfig.json', './tsconfig.spec.json'],
         tsconfigRootDir: import.meta.dirname,
       },
     },
