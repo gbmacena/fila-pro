@@ -51,7 +51,7 @@ export class TicketsService implements ITicketsService {
     }
   }
 
-  async getWaitingTickets(userId: string) {
+  getWaitingTickets(userId: string) {
     return this.prisma.ticket.findMany({
       where: { status: 'WAITING', userId },
       orderBy: { createdAt: 'asc' },

@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { QueueService } from './queue.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -134,7 +132,15 @@ describe('QueueService', () => {
 
         .mockResolvedValueOnce(callingTicket);
 
-      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({
+        id: 'ticket-1',
+        code: 'A001',
+        status: 'CALLING',
+        createdAt: new Date(),
+        calledAt: new Date(),
+        finishedAt: null,
+        userId: mockUserId,
+      });
       jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       await service.callNext(mockUserId);
@@ -171,7 +177,15 @@ describe('QueueService', () => {
 
         .mockResolvedValueOnce(null);
 
-      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({
+        id: 'ticket-2',
+        code: 'A002',
+        status: 'CALLING',
+        createdAt: new Date(),
+        calledAt: new Date(),
+        finishedAt: null,
+        userId: mockUserId,
+      });
       jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       await service.callNext(mockUserId);
@@ -190,7 +204,15 @@ describe('QueueService', () => {
       jest
         .mocked(prismaService.ticket.findFirst)
         .mockResolvedValue(callingTicket);
-      jest.mocked(prismaService.ticket.update).mockResolvedValue({} as any);
+      jest.mocked(prismaService.ticket.update).mockResolvedValue({
+        id: callingTicket!.id,
+        code: callingTicket!.code,
+        status: 'DONE',
+        createdAt: callingTicket!.createdAt,
+        calledAt: callingTicket!.calledAt,
+        finishedAt: new Date(),
+        userId: mockUserId,
+      });
       jest.mocked(prismaService.ticket.findMany).mockResolvedValue([]);
 
       const result = await service.finish(mockUserId);

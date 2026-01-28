@@ -12,6 +12,14 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 
+interface WaitingTicket {
+  id: string;
+}
+
+interface QueueState {
+  averageTime: number;
+}
+
 @ApiTags('tickets')
 @ApiBearerAuth('JWT-auth')
 @Controller('tickets')
@@ -31,11 +39,16 @@ export class TicketsController {
     type: CreateTicketResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Não autorizado' })
-  async create(@UserId() userId: string) {
+  async create(@UserId() userId: string): Promise<CreateTicketResponseDto> {
     const ticket = await this.ticketsService.createTicket(userId);
-    const state = await this.queueService.getQueueState(userId);
-    const waitingTickets = await this.ticketsService.getWaitingTickets(userId);
+
+    const state: QueueState = await this.queueService.getQueueState(userId);
+
+    const waitingTickets: WaitingTicket[] =
+      await this.ticketsService.getWaitingTickets(userId);
+
     const position = waitingTickets.findIndex((t) => t.id === ticket.id) + 1;
+
     const estimatedWait = position * state.averageTime;
 
     await this.gateway.emitQueueUpdate(userId);
