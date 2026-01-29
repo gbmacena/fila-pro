@@ -55,7 +55,9 @@ jobs:
           --health-retries=5
 
     env:
+      NODE_ENV: test
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      JWT_SECRET: test-secret
 
     steps:
       - name: Checkout code
