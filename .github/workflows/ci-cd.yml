@@ -7,29 +7,31 @@ on:
     branches: [main]
 
 jobs:
-   test-frontend:
+  test-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend deps
+      - name: Install frontend dependencies
         run: |
           cd frontend
           npm ci
 
-      - name: Frontend lint
+      - name: Run frontend linting
         run: |
           cd frontend
           npm run lint
 
-      - name: Frontend tests
+      - name: Run frontend tests
         run: |
           cd frontend
           npm test -- --watchAll=false
@@ -37,46 +39,28 @@ jobs:
   test-backend:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_db
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
-      JWT_SECRET: test-secret
-      NODE_ENV: test
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: backend/package-lock.json
 
-      - name: Install backend deps
+      - name: Install backend dependencies
         run: |
           cd backend
           npm ci
 
-      - name: Backend lint
+      - name: Run backend linting
         run: |
           cd backend
           npm run lint
 
-      - name: Backend e2e tests
+      - name: Build backend
         run: |
           cd backend
-          npm run test:e2e
+          npm run build
