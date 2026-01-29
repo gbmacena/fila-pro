@@ -20,6 +20,11 @@ describe('FilaPro API (e2e)', () => {
     await app.init();
   });
 
+  beforeEach(async () => {
+    await prisma.ticket.deleteMany();
+    await prisma.user.deleteMany();
+  });
+
   afterEach(async () => {
     await prisma.ticket.deleteMany();
     await prisma.user.deleteMany();
