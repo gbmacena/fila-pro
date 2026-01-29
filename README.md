@@ -6,6 +6,20 @@ Um sistema completo de gerenciamento de filas em tempo real, desenvolvido com te
 
 O Fila-Pro é uma aplicação web que permite aos usuários gerenciar filas de atendimento de forma eficiente. Inclui funcionalidades de autenticação, criação de tickets, acompanhamento em tempo real via WebSocket, painel público para visualização e um dashboard administrativo.
 
+## Preview
+
+### Landing Page
+
+![Landing Page](previews/landing-page.png)
+
+### Dashboard Administrativo
+
+![Dashboard](previews/dashboard.png)
+
+### Painel Público
+
+![Painel Público](previews/public-panel.png)
+
 ## ✨ Funcionalidades
 
 - **Autenticação JWT**: Sistema seguro de login e registro de usuários
