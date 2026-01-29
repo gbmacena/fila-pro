@@ -26,7 +26,7 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Run frontend linting
+      - name: Run frontend lint
         run: |
           cd frontend
           npm run lint
@@ -38,6 +38,24 @@ jobs:
 
   test-backend:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
 
     steps:
       - name: Checkout code
@@ -55,10 +73,30 @@ jobs:
           cd backend
           npm ci
 
-      - name: Run backend linting
+      - name: Generate Prisma Client
+        run: |
+          cd backend
+          npx prisma generate
+
+      - name: Run Prisma migrations
+        run: |
+          cd backend
+          npx prisma migrate deploy
+
+      - name: Run backend lint
         run: |
           cd backend
           npm run lint
+
+      - name: Run backend unit tests
+        run: |
+          cd backend
+          npm test
+
+      - name: Run backend e2e tests
+        run: |
+          cd backend
+          npm run test:e2e
 
       - name: Build backend
         run: |
