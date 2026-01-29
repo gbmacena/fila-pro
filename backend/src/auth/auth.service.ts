@@ -3,10 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service';
 import { IAuthService } from '../common/interfaces/services.interface';
-import {
-  UserAlreadyExistsException,
-  InvalidCredentialsException,
-} from '../common/exceptions/custom.exceptions';
+import { InvalidCredentialsException } from '../common/exceptions/custom.exceptions';
+import { UserAlreadyExistsException } from '../common/exceptions/custom.exceptions';
 import { JWT_EXPIRES_IN } from '../common/constants/app.constants';
 
 @Injectable()
@@ -21,7 +19,8 @@ export class AuthService implements IAuthService {
     email: string,
     password: string,
   ): Promise<{
-    message: string;
+    access_token: string;
+    user: { id: string; username: string; email: string };
   }> {
     const existingUser = await this.prisma.user.findFirst({
       where: { OR: [{ username }, { email }] },
@@ -33,11 +32,27 @@ export class AuthService implements IAuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await this.prisma.user.create({
-      data: { username, email, password: hashedPassword },
-    });
+    try {
+      const user = await this.prisma.user.create({
+        data: { username, email, password: hashedPassword },
+      });
 
-    return { message: 'Usuário registrado com sucesso' };
+      const payload = { username: user.username, sub: user.id };
+
+      const access_token = this.jwtService.sign(payload, {
+        expiresIn: JWT_EXPIRES_IN,
+      });
+
+      return {
+        access_token,
+        user: { id: user.id, username: user.username, email: user.email },
+      };
+    } catch (error) {
+      if (error.code === 'P2002') {
+        throw new UserAlreadyExistsException();
+      }
+      throw error;
+    }
   }
 
   async login(

@@ -3,7 +3,10 @@ export interface IAuthService {
     username: string,
     email: string,
     password: string,
-  ): Promise<{ message: string }>;
+  ): Promise<{
+    access_token: string;
+    user: { id: string; username: string; email: string };
+  }>;
 
   login(
     username: string,

@@ -10,6 +10,13 @@ import { QueueService } from './queue.service';
 import { IQueueGateway } from '../common/interfaces/services.interface';
 import { QueueEvents } from '../common/constants/app.constants';
 
+interface JwtPayload {
+  sub: string;
+  username: string;
+  iat?: number;
+  exp?: number;
+}
+
 @WebSocketGateway({
   cors: { origin: '*', methods: ['GET', 'POST'], allowedHeaders: ['*'] },
 })
@@ -26,16 +33,27 @@ export class QueueGateway
 
   handleConnection(client: Socket) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const token = client.handshake.auth?.token;
+      const token = client.handshake.auth?.token as string | undefined;
+      const userId = client.handshake.auth?.userId as string | undefined;
+
       if (token) {
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-        const payload: any = this.jwtService.verify(token);
-        const userId = payload.sub;
+        try {
+          const payload = this.jwtService.verify<JwtPayload>(token);
+          const userIdFromToken = payload.sub;
+          void client.join(userIdFromToken);
+        } catch (error) {
+          console.error('Invalid JWT token:', error);
+          client.disconnect();
+          return;
+        }
+      } else if (userId) {
         void client.join(userId);
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+        void this.emitPublicQueueUpdate(userId);
+      } else {
+        client.disconnect();
       }
-    } catch {
+    } catch (error) {
+      console.error('WebSocket connection error:', error);
       client.disconnect();
     }
   }

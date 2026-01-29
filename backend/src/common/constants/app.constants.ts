@@ -1,4 +1,4 @@
-export const JWT_SECRET = process.env.JWT_SECRET || 'secret';
+export const JWT_SECRET = process.env.JWT_SECRET;
 export const JWT_EXPIRES_IN = '12h';
 
 export const TICKET_CODE_PREFIX = 'A';

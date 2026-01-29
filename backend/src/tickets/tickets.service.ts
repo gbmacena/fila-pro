@@ -26,8 +26,6 @@ export class TicketsService implements ITicketsService {
       .toString()
       .padStart(TICKET_CODE_LENGTH, '0')}`;
 
-    console.log('Tentando criar ticket com código:', nextCode);
-
     while (true) {
       try {
         const ticket = await this.prisma.ticket.create({

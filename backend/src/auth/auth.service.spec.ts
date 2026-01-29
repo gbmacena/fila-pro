@@ -73,6 +73,7 @@ describe('AuthService', () => {
       prismaService.user.findFirst.mockResolvedValue(null);
       jest.mocked(prismaService.user.create).mockResolvedValue(mockUser);
       jest.mocked(bcrypt.hash).mockResolvedValue('hashedpassword' as never);
+      jwtService.sign.mockReturnValue('mock-jwt-token');
 
       const result = await service.register(
         registerDto.username,
@@ -80,7 +81,14 @@ describe('AuthService', () => {
         registerDto.password,
       );
 
-      expect(result).toEqual({ message: 'Usuário registrado com sucesso' });
+      expect(result).toEqual({
+        access_token: expect.any(String),
+        user: {
+          id: mockUser.id,
+          username: mockUser.username,
+          email: mockUser.email,
+        },
+      });
       expect(prismaService.user.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [

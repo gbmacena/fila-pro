@@ -8,7 +8,7 @@ export class UserAlreadyExistsException extends HttpException {
 
 export class InvalidCredentialsException extends HttpException {
   constructor() {
-    super('Invalid credentials', HttpStatus.UNAUTHORIZED);
+    super('Credenciais inválidas', HttpStatus.UNAUTHORIZED);
   }
 }
 

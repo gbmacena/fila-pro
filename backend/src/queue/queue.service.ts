@@ -12,6 +12,14 @@ export class QueueService implements IQueueService {
   constructor(private prisma: PrismaService) {}
 
   async getQueueState(userId: string) {
+    return this.getQueueStateInternal(userId, 20);
+  }
+
+  async getPublicQueueState(userId: string) {
+    return this.getQueueStateInternal(userId, 5);
+  }
+
+  private async getQueueStateInternal(userId: string, nextLimit: number) {
     const tickets = await this.prisma.ticket.findMany({
       where: { userId },
       orderBy: { createdAt: 'asc' },
@@ -24,7 +32,7 @@ export class QueueService implements IQueueService {
     const averageTime = this.calculateAverageTime(done);
 
     const current = calling?.code || null;
-    const next = waiting.slice(0, 20).map((t, index) => ({
+    const next = waiting.slice(0, nextLimit).map((t, index) => ({
       code: t.code,
       position: index + 1,
       estimatedWait: (index + 1) * averageTime,
@@ -87,36 +95,6 @@ export class QueueService implements IQueueService {
     });
 
     return this.getQueueState(userId);
-  }
-
-  async getPublicQueueState(userId: string) {
-    const tickets = await this.prisma.ticket.findMany({
-      where: { userId },
-      orderBy: { createdAt: 'asc' },
-    });
-
-    const waiting = tickets.filter((t) => t.status === 'WAITING');
-    const calling = tickets.find((t) => t.status === 'CALLING');
-    const done = tickets.filter((t) => t.status === 'DONE');
-
-    const averageTime = this.calculateAverageTime(done);
-
-    const current = calling?.code || null;
-    const next = waiting.slice(0, 5).map((t, index) => ({
-      code: t.code,
-      position: index + 1,
-      estimatedWait: (index + 1) * averageTime,
-    }));
-    const total = waiting.length;
-    const estimatedWait = total > 0 ? total * averageTime : 0;
-
-    return {
-      current,
-      next,
-      total,
-      averageTime,
-      estimatedWait,
-    };
   }
 
   async getMyPosition(ticketCode: string, userId: string) {

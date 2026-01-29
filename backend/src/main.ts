@@ -43,7 +43,17 @@ async function bootstrap() {
     },
   });
   app.useWebSocketAdapter(new IoAdapter(app));
-  app.enableCors();
+
+  const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ['http://localhost:3000', 'http://localhost:3001'];
+
+  app.enableCors({
+    origin: corsOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  });
 
   const config = new DocumentBuilder()
     .setTitle('FilaPro API')
