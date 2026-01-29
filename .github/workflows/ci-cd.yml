@@ -7,60 +7,76 @@ on:
     branches: [main]
 
 jobs:
-  test-frontend:
+  # test-frontend:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install frontend deps
         run: |
           cd frontend
           npm ci
 
-      - name: Run frontend linting
+      - name: Frontend lint
         run: |
           cd frontend
           npm run lint
 
-      - name: Run frontend tests
+      - name: Frontend tests
         run: |
           cd frontend
           npm test -- --watchAll=false
 
-  # test-backend:
-  #   runs-on: ubuntu-latest
+  test-backend:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: "20"
-  #         cache: "npm"
-  #         cache-dependency-path: backend/package-lock.json
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+      JWT_SECRET: test-secret
+      NODE_ENV: test
 
-  #     - name: Install backend dependencies
-  #       run: |
-  #         cd backend
-  #         npm ci
+    steps:
+      - uses: actions/checkout@v4
 
-  #     - name: Run backend linting
-  #       run: |
-  #         cd backend
-  #         npm run lint
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
 
-  #     - name: Build backend
-  #       run: |
-  #         cd backend
-  #         npm run build
+      - name: Install backend deps
+        run: |
+          cd backend
+          npm ci
+
+      - name: Backend lint
+        run: |
+          cd backend
+          npm run lint
+
+      - name: Backend e2e tests
+        run: |
+          cd backend
+          npm run test:e2e
