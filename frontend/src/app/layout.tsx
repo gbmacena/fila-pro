@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sistema de Filas - FilaPro",
   description: "Sistema de gerenciamento de filas em tempo real",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
