@@ -21,7 +21,6 @@ export class ErrorInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       catchError((error: unknown) => {
-        console.error('Erro capturado pelo ErrorInterceptor:', error);
         let statusCode = 500;
         let message = 'Erro interno do servidor';
 
