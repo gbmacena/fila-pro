@@ -20,7 +20,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
-    "types": ["node", "jest"]
+    "types": ["node"]
   },
   "exclude": ["**/*.spec.ts", "**/*.test.ts", "test/**/*", "src/generated/**/*"]
 }
