@@ -32,6 +32,7 @@ export class AuthController {
         registerDto.password,
       );
     } catch (error) {
+      console.error('Register error:', error);
       if (error instanceof ConflictException) {
         throw new HttpException(
           'Nome de usuário ou email já existe',
