@@ -31,6 +31,11 @@ O Fila-Pro é uma aplicação web que permite aos usuários gerenciar filas de a
 - **API RESTful**: Backend robusto com NestJS
 - **Interface Responsiva**: Frontend moderno com Next.js e Tailwind CSS
 
+## 🌐 Acesso Online
+
+- **Frontend Deploy**: [https://fila-pro.vercel.app/](https://fila-pro.vercel.app/)
+- **Backend API Docs (Swagger)**: [https://fila-pro-backend.onrender.com/api](https://fila-pro-backend.onrender.com/api)
+
 ## 🛠️ Tecnologias Utilizadas
 
 ### Backend
@@ -278,4 +283,3 @@ A documentação completa da API está disponível via Swagger em `/api` quando 
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
-
