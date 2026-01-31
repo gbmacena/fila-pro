@@ -34,6 +34,7 @@ O Fila-Pro é uma aplicação web que permite aos usuários gerenciar filas de a
 ## 🌐 Acesso Online
 
 - **Frontend Deploy**: [https://fila-pro.vercel.app/](https://fila-pro.vercel.app/)
+- **Backend**: [https://fila-pro-backend.onrender.com/](https://fila-pro-backend.onrender.com/)
 - **Backend API Docs (Swagger)**: [https://fila-pro-backend.onrender.com/api](https://fila-pro-backend.onrender.com/api)
 
 ## 🛠️ Tecnologias Utilizadas
